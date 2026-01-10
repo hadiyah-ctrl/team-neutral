@@ -1,0 +1,9 @@
+{
+  "users": [
+    { "id": 1, "name": "Admin", "email": "admin@example.com", "password": "1234", "points": 0 }
+  ],
+  "books": [
+    { "id": 1, "title": "1984", "author": "George Orwell", "owner": "admin@example.com", "condition": "Good", "pointsValue": 10, "history": [], "image": "/images/1984.jpg" },
+    { "id": 2, "title": "Harry Potter", "author": "J.K. Rowling", "owner": "admin@example.com", "condition": "New", "pointsValue": 10, "history": [], "image": "/images/hp.jpg" }
+  ]
+}
