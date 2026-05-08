@@ -1,7 +1,7 @@
 // BookDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBook, updateBook } from "../utils/fakeApi";
+import { getBook, updateBook } from "../utils/api";
 
 export default function BookDetail() {
   const { id } = useParams();

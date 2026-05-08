@@ -1,4 +1,4 @@
-// src/utils/fakeApi.js
+// src/utils/api.js
 const KEY = "books_exchange_books_v1";
 
 const seed = [

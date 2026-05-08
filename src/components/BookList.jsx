@@ -1,6 +1,6 @@
 // BookList.jsx
 import { useEffect, useState } from "react";
-import { listBooks } from "../utils/fakeApi";
+import { listBooks } from "../utils/api";
 
 export default function BookList() {
   const [books, setBooks] = useState([]);

@@ -1,72 +1,89 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
+
+import db from "./src/db.json" with { type: "json" };
+
+dotenv.config();
 
 const app = express();
+const port = Number(process.env.PORT) || 5000;
+
+let users = [...db.users];
+let books = [...db.books];
+
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect(
-  "mongodb+srv://hadiyahawan26_db_user:0lM1217wplkxSU5i@cluster0.th9jdco.mongodb.net/booksExchangeDB?retryWrites=true&w=majority",
-  { useNewUrlParser: true, useUnifiedTopology: true }
-)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.error("MongoDB connection error:", err));
-
-// Schemas
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
-  points: { type: Number, default: 0 }
+app.get("/", (req, res) => {
+  res.send("BooksExchange API running");
 });
 
-const bookSchema = new mongoose.Schema({
-  title: String,
-  author: String,
-  owner: String, // user email or id
-  condition: String,
-  history: { type: Array, default: [] },
-  pointsValue: { type: Number, default: 10 }
-});
-
-// Models
-const User = mongoose.model("User", userSchema);
-const Book = mongoose.model("Book", bookSchema);
-
-// Routes
-app.get("/", (req, res) => res.send("Server running"));
-
-// Signup
-app.post("/signup", async (req, res) => {
+app.post("/signup", (req, res) => {
   const { name, email, password } = req.body;
-  const existing = await User.findOne({ email });
-  if (existing) return res.status(400).json({ message: "User exists" });
-  const user = await User.create({ name, email, password });
-  res.json(user);
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: "Name, email, and password are required" });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const existing = users.find((user) => user.email === normalizedEmail);
+
+  if (existing) {
+    return res.status(400).json({ message: "User exists" });
+  }
+
+  const user = {
+    id: Date.now(),
+    name: name.trim(),
+    email: normalizedEmail,
+    password,
+    points: 0,
+  };
+
+  users = [...users, user];
+  res.status(201).json(user);
 });
 
-// Login
-app.post("/login", async (req, res) => {
+app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email, password });
-  if (!user) return res.status(400).json({ message: "Invalid credentials" });
+  const normalizedEmail = (email || "").trim().toLowerCase();
+  const user = users.find(
+    (item) => item.email === normalizedEmail && item.password === password,
+  );
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
   res.json(user);
 });
 
-// Get books
-app.get("/books", async (req, res) => {
-  const books = await Book.find();
+app.get("/books", (req, res) => {
   res.json(books);
 });
 
-// Add book
-app.post("/books", async (req, res) => {
-  const { title, author, owner, condition } = req.body;
-  const book = await Book.create({ title, author, owner, condition });
-  res.json(book);
+app.post("/books", (req, res) => {
+  const { title, author, owner, condition = "Good", pointsValue = 10 } = req.body;
+
+  if (!title || !author) {
+    return res.status(400).json({ message: "Title and author are required" });
+  }
+
+  const book = {
+    id: Date.now(),
+    title: title.trim(),
+    author: author.trim(),
+    owner,
+    condition,
+    pointsValue,
+    history: [],
+  };
+
+  books = [book, ...books];
+  res.status(201).json(book);
 });
 
-// Start server
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
