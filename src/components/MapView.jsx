@@ -1,33 +1,39 @@
-// MapView.jsx (OpenStreetMap)
-import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-
-// Fix Leaflet marker icons in Vite/React builds
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
+// MapView.jsx (OpenStreetMap embed)
 export default function MapView() {
-  const center = [24.8607, 67.0011]; // Karachi default
+  const latitude = 24.8607;
+  const longitude = 67.0011;
+  const delta = 0.03;
+  const bbox = [
+    longitude - delta,
+    latitude - delta,
+    longitude + delta,
+    latitude + delta,
+  ].join(",");
 
   return (
-    <div style={{ height: 380, width: "100%", borderRadius: 14, overflow: "hidden" }}>
-      <MapContainer center={center} zoom={12} style={{ height: "100%", width: "100%" }}>
-        <TileLayer
-          attribution='&copy; OpenStreetMap contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={center}>
-          <Popup>Pickup / Exchange Area</Popup>
-        </Marker>
-      </MapContainer>
+    <div style={styles.wrapper}>
+      <iframe
+        title="Nearby exchange location map"
+        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${latitude},${longitude}`}
+        style={styles.frame}
+        loading="lazy"
+      />
     </div>
   );
 }
+
+const styles = {
+  wrapper: {
+    height: 380,
+    width: "100%",
+    borderRadius: 14,
+    overflow: "hidden",
+    border: "1px solid #e5e7eb",
+    background: "#f9fafb",
+  },
+  frame: {
+    width: "100%",
+    height: "100%",
+    border: 0,
+  },
+};

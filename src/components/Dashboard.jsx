@@ -1,16 +1,22 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MapView from "./MapView";
 import { createBook, listBooks } from "../utils/api";
 
 
 export default function Dashboard() {
-  const [books, setBooks] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("books_exchange_books_v1") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    let alive = true;
+
+    listBooks().then((data) => {
+      if (alive) setBooks(data);
+    });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
